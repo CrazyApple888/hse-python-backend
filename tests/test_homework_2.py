@@ -80,6 +80,7 @@ def deleted_item(existing_item: dict[str, Any]) -> dict[str, Any]:
 def test_post_cart() -> None:
     response = client.post("/cart")
 
+    print(response)
     assert response.status_code == HTTPStatus.CREATED
     assert "location" in response.headers
     assert "id" in response.json()
