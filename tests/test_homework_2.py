@@ -27,7 +27,7 @@ def existing_items() -> list[int]:
         for i in range(10)
     ]
 
-    return [client.post("/item").json()["id"] for item in items]
+    return [client.post("/item", json=item ).json()["id"] for item in items]
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -79,7 +79,6 @@ def deleted_item(existing_item: dict[str, Any]) -> dict[str, Any]:
 def test_post_cart() -> None:
     response = client.post("/cart")
 
-    print(response)
     assert response.status_code == HTTPStatus.CREATED
     assert "location" in response.headers
     assert "id" in response.json()
@@ -107,7 +106,7 @@ def test_get_cart(request, cart: int, not_empty: bool) -> None:
     if not_empty:
         price = 0
 
-        for item in response_json["item"]:
+        for item in response_json["items"]:
             item_id = item["id"]
             price += client.get(f"/item/{item_id}").json()["price"] * item["quantity"]
 
