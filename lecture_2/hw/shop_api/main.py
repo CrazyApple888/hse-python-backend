@@ -48,6 +48,7 @@ def get_carts(offset: Annotated[int, Query(ge=0)] = 0,
     carts = cart_repository.get_carts(offset, limit, min_price, max_price, min_quantity, max_quantity)
     return list(map(cart_to_cart_dto, carts))
 
+
 @app.post(
     path="/cart/{cart_id}/add/{item_id}"
 )
@@ -59,6 +60,7 @@ def add_item_to_cart(cart_id: int, item_id: int) -> CartDto:
     if cart is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     return cart_to_cart_dto(cart)
+
 
 @app.post(
     path="/item",
@@ -82,12 +84,13 @@ def get_item(id: int) -> ItemDto:
 @app.get(
     path="/item"
 )
-def get_items(offset: int = 0,
-              limit: int = 0,
-              min_price: float | None = None,
-              max_price: float | None = None,
-              show_deleted: bool = False):
-    ...
+def get_items(offset: Annotated[int, Query(ge=0)] = 0,
+              limit: Annotated[int, Query(gt=0)] = 10,
+              min_price: Annotated[float | None, Query(gt=0)] = None,
+              max_price: Annotated[float | None, Query(gt=0)] = None,
+              show_deleted: Annotated[bool, Query()] = False):
+    items = item_repository.get_items(offset, limit, min_price, max_price, show_deleted)
+    return list(map(item_to_item_dto, items))
 
 
 @app.put(
