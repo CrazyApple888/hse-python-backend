@@ -1,6 +1,6 @@
 from typing import List
 
-from lecture_2.hw.shop_api.model import Cart
+from lecture_2.hw.shop_api.model import Cart, Item
 
 
 class CartRepository:
@@ -25,13 +25,11 @@ class CartRepository:
                   max_quantity: int | None = None) -> List[Cart]:
         carts = list(self.__carts__.values())
 
-        # Применение фильтрации по цене
         if min_price is not None:
             carts = [cart for cart in carts if cart.price >= min_price]
         if max_price is not None:
             carts = [cart for cart in carts if cart.price <= max_price]
 
-        # Фильтрация по количеству товаров
         if min_quantity is not None:
             carts = [cart for cart in carts if len(cart.items) >= min_quantity]
         if max_quantity is not None:
@@ -39,10 +37,16 @@ class CartRepository:
 
         total_carts = len(carts)
         if offset >= total_carts:
-            return []  # Если смещение больше, чем количество корзин, вернуть пустой список
+            return []
 
-        # Ограничение с учетом того, что limit может выходить за пределы списка
         end_index = min(offset + limit, total_carts)
 
-        # Применение смещения и ограничения
         return carts[offset:end_index]
+
+    def add_item(self, cart_id: int, item: Item) -> Cart | None:
+        cart = self.__carts__.get(cart_id)
+        if cart is None:
+            return None
+        cart.items.append(item)
+
+        return cart

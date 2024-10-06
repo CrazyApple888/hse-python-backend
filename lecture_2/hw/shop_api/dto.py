@@ -19,6 +19,7 @@ class ItemDto:
     name: str
     price: float
     deleted: bool
+    quantity: int
 
 
 @dataclass
