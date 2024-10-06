@@ -8,7 +8,7 @@ from starlette.responses import Response
 from lecture_2.hw.shop_api.cart_repository import CartRepository
 from lecture_2.hw.shop_api.dto import CartDto, ItemDto, CreateItemRequest, PutItemRequest, PatchItemRequest
 from lecture_2.hw.shop_api.item_repository import ItemRepository
-from lecture_2.hw.shop_api.mappers import cart_to_cart_dto, item_dto_to_item, item_to_item_dto
+from lecture_2.hw.shop_api.mappers import cart_to_cart_dto, item_to_item_dto
 
 app = FastAPI(title="Shop API")
 item_repository = ItemRepository()
@@ -48,6 +48,17 @@ def get_carts(offset: Annotated[int, Query(ge=0)] = 0,
     carts = cart_repository.get_carts(offset, limit, min_price, max_price, min_quantity, max_quantity)
     return list(map(cart_to_cart_dto, carts))
 
+@app.post(
+    path="/cart/{cart_id}/add/{item_id}"
+)
+def add_item_to_cart(cart_id: int, item_id: int) -> CartDto:
+    item = item_repository.get_item(item_id)
+    if item is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    cart = cart_repository.add_item(cart_id, item)
+    if cart is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND)
+    return cart_to_cart_dto(cart)
 
 @app.post(
     path="/item",
