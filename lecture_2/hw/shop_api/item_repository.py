@@ -1,3 +1,5 @@
+from typing import List
+
 from lecture_2.hw.shop_api.model import Item
 
 
@@ -41,3 +43,28 @@ class ItemRepository:
         if item is None:
             return
         item.deleted = True
+
+    def get_items(self,
+                  offset: int,
+                  limit: int,
+                  min_price: float | None,
+                  max_price: float | None,
+                  show_deleted: bool) -> List[Item]:
+
+        items = list(self.__items__.values())
+
+        if not show_deleted:
+            items = [item for item in items if not item.deleted]
+
+        if min_price is not None:
+            items = [item for item in items if item.price >= min_price]
+        if max_price is not None:
+            items = [item for item in items if item.price <= max_price]
+
+        total_items = len(items)
+        if offset >= total_items:
+            return []
+
+        end_index = min(offset + limit, total_items)
+
+        return items[offset:end_index]

@@ -48,5 +48,6 @@ class CartRepository:
         if cart is None:
             return None
         cart.items.append(item)
+        cart.price += item.price
 
         return cart
