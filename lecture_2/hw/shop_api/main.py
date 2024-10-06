@@ -1,4 +1,7 @@
+from typing import List, Annotated
+
 from fastapi import FastAPI, HTTPException
+from fastapi.params import Query
 from starlette import status
 from starlette.responses import Response
 
@@ -33,6 +36,19 @@ def get_card(id: int) -> CartDto:
     return cart_to_cart_dto(cart)
 
 
+@app.get(
+    path="/cart"
+)
+def get_carts(offset: Annotated[int, Query(ge=0)] = 0,
+              limit: Annotated[int, Query(gt=0)] = 10,
+              min_price: Annotated[float | None, Query(gt=0)] = None,
+              max_price: Annotated[float | None, Query(gt=0)] = None,
+              min_quantity: Annotated[int | None, Query(ge=0)] = None,
+              max_quantity: Annotated[int | None, Query(ge=0)] = None) -> List[CartDto]:
+    carts = cart_repository.get_carts(offset, limit, min_price, max_price, min_quantity, max_quantity)
+    return list(map(cart_to_cart_dto, carts))
+
+
 @app.post(
     path="/item",
     status_code=status.HTTP_201_CREATED,
@@ -52,12 +68,15 @@ def get_item(id: int) -> ItemDto:
     return item_to_item_dto(item)
 
 
+@app.get(
+    path="/item"
+)
 def get_items(offset: int = 0,
               limit: int = 0,
               min_price: float | None = None,
               max_price: float | None = None,
               show_deleted: bool = False):
-    pass
+    ...
 
 
 @app.put(
