@@ -5,12 +5,15 @@ from fastapi.params import Query
 from starlette import status
 from starlette.responses import Response
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
 from lecture_2.hw.shop_api.cart_repository import CartRepository
 from lecture_2.hw.shop_api.dto import CartDto, ItemDto, CreateItemRequest, PutItemRequest, PatchItemRequest
 from lecture_2.hw.shop_api.item_repository import ItemRepository
 from lecture_2.hw.shop_api.mappers import cart_to_cart_dto, item_to_item_dto
 
 app = FastAPI(title="Shop API")
+Instrumentator().instrument(app).expose(app)
 item_repository = ItemRepository()
 cart_repository = CartRepository()
 
